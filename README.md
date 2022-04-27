@@ -29,3 +29,5 @@ You need to create file local.setting.json with the following values. This is a 
   }
 }
 ```
+
+You can then run [the noebook](visualisation.ipynb) and see your own timeline. If you want to have your own public website, then you can use Azure Function. You should be able to get their free credit. 
