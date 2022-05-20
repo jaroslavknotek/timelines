@@ -2,6 +2,7 @@ import logging
 import os
 
 import azure.functions as func
+
 import shared_code.note2html
 
 

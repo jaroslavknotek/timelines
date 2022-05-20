@@ -1,4 +1,4 @@
-import azure_functions.shared_code.notes_table_client as ntc
+import shared_code.notes_table_client as ntc
 
 
 def _get_note_html(note):

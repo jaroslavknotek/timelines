@@ -1,6 +1,7 @@
 import sys
 
 sys.path.append("..")
+sys.path.append("../azure_functions")
 import json
 
 import azure_functions.shared_code.note2html

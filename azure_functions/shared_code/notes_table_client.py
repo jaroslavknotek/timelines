@@ -1,6 +1,6 @@
 import json
 
-import azure_functions.shared_code.note_model as nm
+import shared_code.note_model as nm
 from azure.data.tables import TableClient, UpdateMode
 
 

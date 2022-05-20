@@ -7,3 +7,7 @@ __pycache__
 note_visualisation.ipynb
 
 **/.ipynb_checkpoints
+
+**/.venv
+**/.vscode
+notes.list
