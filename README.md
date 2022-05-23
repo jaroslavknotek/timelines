@@ -6,6 +6,10 @@ This repository contains my personal implementation of custom timelines
 - Twitter timeline
 - Notes reminder
 
+# Installation
+
+The requirements file for functions is [here](azure_functions/requirements.txt). But for development tools (like flask for running it locally) use also this [requirements file](tools/requirements.dev.txt).
+
 
 # Rudimentary Twitter Home Timeline 
 

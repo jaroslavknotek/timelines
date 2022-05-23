@@ -1,41 +1,65 @@
-import sys
 import os
+import sys
 
 sys.path.append("..")
 sys.path.append("../azure_functions")
 
 import json
+
 import azure_functions.shared_code.notes_table_client as ntc
 from azure_functions.shared_code.note_model import Note
 
-def _read_note(filename:str, notes_root:str) ->Note:
-    filepath = os.path.join(notes_root,filename)
-    with open(filepath) as f:
-        text_all = f.read()
-        # skipping the first `---` to find the second occurence
-        header_end = text_all[3:].index('---')
-        text = text_all[header_end + 6:]
-        text = text.replace("#show_me","").strip()
-        name = filename[:-3]
-        return Note(name = name, text= text)
 
-def _get_notes(path_to_filelist:str, notes_root:str):
-    with open(path_to_filelist,'r') as f:
-        filenames = f.readlines()
-    
-    return [_read_note(filename.strip(), notes_root) for filename in filenames]
-    
+def _read_file(filepath):
+    with open(filepath, "r") as f:
+        return f.read()
 
-def sync(path_to_filelist:str, notes_root:str):
-    notes = _get_notes(path_to_filelist, notes_root)
-    
+
+def _trim_note(note_text, tag):
+    header_end = note_text[3:].index("---")
+    text = note_text[header_end + 6 :]
+    return text.replace(tag, "").strip()
+
+
+def _trim_name(note_name: str) -> str:
+    return note_name.rstrip(".md")
+
+
+def _get_tagged_notes(notes_root, tag="#show_me"):
+
+    notes_filename = [
+        filename for filename in os.listdir(notes_root) if filename.endswith(".md")
+    ]
+    notes_texts = (
+        _read_file(os.path.join(notes_root, note_filename))
+        for note_filename in notes_filename
+    )
+
+    shownotes = (
+        (_trim_name(name), _trim_note(note, tag))
+        for name, note in zip(notes_filename, notes_texts)
+        if tag in note
+    )
+
+    return [Note(name=name, text=text) for name, text in shownotes]
+
+
+def sync(notes_root: str, wipe: bool = False):
+    notes = _get_tagged_notes(notes_root)
+
+    print("loaded", len(notes))
     with open("../azure_functions/local.settings.json", "r") as f:
         keys = json.load(f)["Values"]
         connection_string = keys["StorageAccountConnectionString"]
-        
+
     client = ntc.NotesClient(connection_string)
+    if wipe:
+        print("wiping all")
+        client.remove_all()
+    print("upserting notes")
     client.upsert_notes(notes)
+    print("sync done")
+
 
 if __name__ == "__main__":
-    sync(sys.argv[1], sys.argv[2])
-    
+    sync(sys.argv[1])

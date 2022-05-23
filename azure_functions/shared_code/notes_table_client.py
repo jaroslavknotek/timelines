@@ -20,10 +20,21 @@ class NotesClient:
             conn_str=self.connection_string, table_name=self.table_name
         )
 
-    def read_all(self) -> list[nm.Note]:
+    def remove_all(self):
+        entities = self._read_all_entities()
         with self._get_client() as table_client:
-            entities = list(table_client.list_entities())
-            return [nm.from_entity(e) for e in entities]
+            for entity in entities:
+                table_client.delete_entity(
+                    row_key=entity["RowKey"], partition_key=entity["PartitionKey"]
+                )
+
+    def _read_all_entities(self) -> list[dict]:
+        with self._get_client() as table_client:
+            return list(table_client.list_entities())
+
+    def read_all(self) -> list[nm.Note]:
+        entities = self._read_all_entities()
+        return [nm.from_entity(e) for e in entities]
 
     def upsert_notes(self, notes: list[nm.Note]):
         entities = (nm.to_entity(note) for note in notes)
