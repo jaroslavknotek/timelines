@@ -9,39 +9,38 @@ from shared_code.note_model import Note
 
 np.random.seed(seed=4567)
 
+_placeholder_template = "mathplaceholder{}x{}"
 
-def _handle_latex(note_markdown):
-    placeholder_template = "mathplaceholder{}x{}"
 
-    multi_line_matches = re.findall("([$]{3}[^$]*[$]{3})", note_markdown)
+def _replace_latex_w_placeholder(text, matches, suffix):
+    for i, match in enumerate(matches):
+        text = text.replace(match, _placeholder_template.format(suffix, i))
+    return text
 
-    for i, mtch in enumerate(multi_line_matches):
-        note_markdown = note_markdown.replace(
-            mtch, placeholder_template.format("ml", i)
-        )
 
-    single_line_matches = re.findall("([$][^$]*[$])", note_markdown)
-
-    for i, mtch in enumerate(single_line_matches):
-        note_markdown = note_markdown.replace(
-            mtch, placeholder_template.format("sl", i)
-        )
-
-    note_html = mistune.html(note_markdown)
-
-    for i, mtch in enumerate(multi_line_matches):
-        match_html_adjusted = f"\\[{mtch.strip('$')}\\]"
+def _replace_placeholder_w_latex(note_html, matches, suffix, el_start, el_end):
+    for i, mtch in enumerate(matches):
+        match_html_adjusted = f"\\{el_start}{mtch.strip('$')}\\{el_end}"
         note_html = note_html.replace(
-            placeholder_template.format("ml", i), match_html_adjusted
+            _placeholder_template.format(suffix, i), match_html_adjusted
         )
-
-    for i, mtch in enumerate(single_line_matches):
-        match_html_adjusted = f"\\({mtch.strip('$')}\\)"
-        note_html = note_html.replace(
-            placeholder_template.format("sl", i), match_html_adjusted
-        )
-
     return note_html
+
+
+def _handle_latex(text):
+
+    multi_line_matches = re.findall("([$]{3}[^$]*[$]{3})", text)
+    text = _replace_latex_w_placeholder(text, multi_line_matches, "ml")
+
+    single_line_matches = re.findall("([$][^$]*[$])", text)
+    text = _replace_latex_w_placeholder(text, single_line_matches, "sl")
+
+    note_html = mistune.html(text)
+
+    note_html = _replace_placeholder_w_latex(
+        note_html, multi_line_matches, "ml", "[", "]"
+    )
+    return _replace_placeholder_w_latex(note_html, single_line_matches, "sl", "(", ")")
 
 
 def _get_note_html(note: Note) -> str:
