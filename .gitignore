@@ -3,3 +3,11 @@ deploy.sh
 local.settings.json
 
 __pycache__
+
+note_visualisation.ipynb
+
+**/.ipynb_checkpoints
+
+**/.venv
+**/.vscode
+notes.list
