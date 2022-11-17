@@ -11,3 +11,4 @@ note_visualisation.ipynb
 **/.venv
 **/.vscode
 notes.list
+*.swp

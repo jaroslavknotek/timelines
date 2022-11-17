@@ -1,5 +1,0 @@
-azure-functions
-tweepy
-azure-data-tables
-mistune==2.0.2
-numpy
