@@ -22,7 +22,7 @@ def _trim_note(note_text, tag):
 
 
 def _trim_name(note_name: str) -> str:
-    return note_name.rstrip(".md")
+    return note_name[:-3]
 
 
 def _get_tagged_notes(notes_root, tag="#show_me"):
@@ -44,7 +44,7 @@ def _get_tagged_notes(notes_root, tag="#show_me"):
     return [Note(name=name, text=text) for name, text in shownotes]
 
 
-def sync(notes_root: str, wipe: bool = False):
+def sync(notes_root: str, wipe: bool = True):
     notes = _get_tagged_notes(notes_root)
 
     print("loaded", len(notes))
